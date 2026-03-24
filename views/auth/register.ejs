@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register — GramSeva</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/login.css"/>
+</head>
+<body>
+
+<div class="login-wrapper">
+  <div class="login-card" style="max-width:520px">
+
+    <!-- Logo -->
+    <div class="login-logo">
+      <div class="logo-icon">
+        <svg width="36" height="36" viewBox="0 0 38 38" fill="none">
+          <rect width="38" height="38" rx="10" fill="#1b4332"/>
+          <path d="M19 7L9 14v16h6v-8h8v8h6V14L19 7z" fill="#d4a853"/>
+          <circle cx="19" cy="18" r="2.5" fill="#1b4332"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-mr">ग्रामसेवा</div>
+        <div class="logo-en">GramSeva</div>
+      </div>
+    </div>
+
+    <h5 class="login-title">Create Owner Account</h5>
+    <p class="login-sub">Register to start managing your tenants</p>
+
+    <!-- Errors -->
+    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+      <div class="alert alert-danger rounded-3">
+        <% errors.forEach(e => { %>
+          <p class="mb-0 small"><%= e.msg %></p>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <!-- Register Form -->
+    <form action="/register" method="POST" id="registerForm">
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+        <input
+          type="text"
+          name="name"
+          class="form-control custom-input"
+          placeholder="e.g. Suresh Ramrao More"
+          value="<%= typeof formData !== 'undefined' ? formData.name : '' %>"
+          required
+        />
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold">Phone <span class="text-danger">*</span></label>
+          <input
+            type="tel"
+            name="phone"
+            class="form-control custom-input"
+            placeholder="10-digit number"
+            value="<%= typeof formData !== 'undefined' ? formData.phone : '' %>"
+            maxlength="10"
+            required
+          />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+          <input
+            type="email"
+            name="email"
+            class="form-control custom-input"
+            placeholder="your@email.com"
+            value="<%= typeof formData !== 'undefined' ? formData.email : '' %>"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">House Address <span class="text-danger">*</span></label>
+        <textarea
+          name="house_address"
+          class="form-control custom-input"
+          rows="2"
+          placeholder="Your property address"
+          required
+        ><%= typeof formData !== 'undefined' ? formData.house_address : '' %></textarea>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+          <div class="password-wrap">
+            <input
+              type="password"
+              name="password"
+              id="passwordInput"
+              class="form-control custom-input"
+              placeholder="Min 6 characters"
+              required
+              minlength="6"
+            />
+            <button type="button" class="toggle-pass" onclick="togglePassword()">
+              <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-6 mb-4">
+          <label class="form-label fw-semibold">Confirm Password <span class="text-danger">*</span></label>
+          <input
+            type="password"
+            name="confirm_password"
+            id="confirmInput"
+            class="form-control custom-input"
+            placeholder="Re-enter password"
+            required
+          />
+          <div id="matchMsg" class="small mt-1" style="display:none"></div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-login w-100" id="submitBtn">
+        Create Account
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ms-2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </button>
+
+    </form>
+
+    <div class="login-footer">
+      Already have an account?
+      <a href="/login">Login here</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/login.js"></script>
+</body>
+</html>

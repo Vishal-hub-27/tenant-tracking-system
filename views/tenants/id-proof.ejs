@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/id-proof.css"/>
+</head>
+<body>
+
+<div class="container">
+  <div class="form-card">
+
+    <!-- Header -->
+    <div class="form-header">
+      <div class="step-badge">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <path d="M2 10h20"/>
+        </svg>
+      </div>
+      <div>
+        <h4 class="form-title">ID Proof Details</h4>
+        <p class="form-subtitle">Step 2 of 2 — Upload identity document</p>
+      </div>
+      <div class="step-pill">2 / 2</div>
+    </div>
+
+    <!-- Tenant name banner -->
+    <div class="tenant-banner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Tenant saved successfully. Now add ID proof for
+      <strong><%= tenantName %></strong>
+    </div>
+
+    <!-- Validation errors -->
+    <% if (errors.length > 0) { %>
+      <div class="alert alert-danger rounded-3 mt-3">
+        <% errors.forEach(err => { %>
+          <p class="mb-0 small"><%= err.msg %></p>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <!-- Form -->
+    <form
+      action="/single/<%= tenantId %>/id-proof"
+      method="POST"
+      enctype="multipart/form-data"
+      id="proofForm"
+    >
+
+      <!-- ── ID Proof Type ── -->
+      <div class="section-label">
+        <span class="section-icon">01</span> Proof Type
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">
+          Select ID Proof Type <span class="req">*</span>
+        </label>
+        <select name="id_proof_type" class="form-select custom-input" required>
+          <option value="" disabled selected>-- Select proof type --</option>
+          <option value="Aadhaar"          <%= formData.id_proof_type === 'Aadhaar'          ? 'selected' : '' %>>Aadhaar Card</option>
+          <option value="Voter ID"         <%= formData.id_proof_type === 'Voter ID'         ? 'selected' : '' %>>Voter ID</option>
+          <option value="PAN"              <%= formData.id_proof_type === 'PAN'              ? 'selected' : '' %>>PAN Card</option>
+          <option value="Passport"         <%= formData.id_proof_type === 'Passport'         ? 'selected' : '' %>>Passport</option>
+          <option value="Driving Licence"  <%= formData.id_proof_type === 'Driving Licence'  ? 'selected' : '' %>>Driving Licence</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">
+          ID Proof Number <span class="req">*</span>
+        </label>
+        <input
+          type="text"
+          name="id_proof_number"
+          class="form-control custom-input"
+          placeholder="Enter document number"
+          value="<%= formData.id_proof_number || '' %>"
+          required
+        />
+        <div class="form-text text-muted" style="font-size:12px">
+          e.g. Aadhaar: XXXX XXXX XXXX &nbsp;|&nbsp; PAN: ABCDE1234F
+        </div>
+      </div>
+
+      <!-- ── Proof Image Upload ── -->
+      <div class="section-label">
+        <span class="section-icon">02</span> Upload Proof Image
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-semibold">
+          Upload ID Document Photo <span class="req">*</span>
+          <span class="text-muted fw-normal small ms-1">(JPEG or PNG, max 5MB)</span>
+        </label>
+
+        <div class="upload-box" id="uploadBox" onclick="document.getElementById('proofImageInput').click()">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="upload-icon" id="uploadIcon">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <p class="upload-hint" id="uploadHint">Click to upload proof image</p>
+          <p class="upload-hint-sub" id="uploadSub">Photo of Aadhaar, Voter ID or other document</p>
+          <img id="proofPreview" src="" alt="Preview" class="upload-preview"/>
+        </div>
+
+        <!-- name="proof_image" must match multer field name exactly -->
+        <input
+          type="file"
+          name="proof_image"
+          id="proofImageInput"
+          accept="image/jpeg,image/png"
+          required
+          style="display:none"
+        />
+      </div>
+
+      <!-- ── Submit ── -->
+      <div class="form-footer">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary px-4">
+          Back
+        </a>
+        <button type="submit" class="btn btn-submit px-5" id="submitBtn">
+          Save ID Proof &amp; Finish
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ms-2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/id-proof.js"></script>
+</body>
+</html>

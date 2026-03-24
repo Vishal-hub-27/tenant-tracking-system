@@ -1,0 +1,125 @@
+/* ============================================
+   login.css — shared by login.ejs & register.ejs
+   Place in: public/css/login.css
+============================================ */
+
+body {
+  background : #f4f6f3;
+  min-height : 100vh;
+  display    : flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-wrapper {
+  width  : 100%;
+  padding: 24px 16px;
+}
+
+.login-card {
+  background   : #ffffff;
+  border-radius: 20px;
+  padding      : 40px 36px;
+  max-width    : 440px;
+  margin       : 0 auto;
+  box-shadow   : 0 4px 24px rgba(27,67,50,.12);
+}
+
+/* ── LOGO ── */
+.login-logo {
+  display      : flex;
+  align-items  : center;
+  gap          : 12px;
+  margin-bottom: 28px;
+}
+.logo-icon  { display: flex; flex-shrink: 0; }
+.logo-mr    { font-size: 18px; color: #1b4332; font-weight: 600; line-height: 1.1; }
+.logo-en    { font-size: 11px; color: #718096; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
+
+/* ── HEADING ── */
+.login-title {
+  font-size    : 20px;
+  font-weight  : 700;
+  color        : #1b4332;
+  margin-bottom: 4px;
+}
+.login-sub {
+  font-size    : 13px;
+  color        : #718096;
+  margin-bottom: 24px;
+}
+
+/* ── INPUTS ── */
+.custom-input {
+  border       : 1.5px solid #e2ddd4;
+  border-radius: 10px;
+  padding      : 10px 14px;
+  font-size    : 14px;
+  background   : #faf8f4;
+  transition   : border-color .2s, box-shadow .2s;
+}
+.custom-input:focus {
+  border-color: #40916c;
+  box-shadow  : 0 0 0 3px rgba(64,145,108,.12);
+  background  : #fff;
+  outline     : none;
+}
+.custom-input::placeholder { color: #b0bec5; }
+
+/* ── PASSWORD TOGGLE ── */
+.password-wrap {
+  position: relative;
+}
+.password-wrap .custom-input {
+  padding-right: 44px;
+  width        : 100%;
+}
+.toggle-pass {
+  position  : absolute;
+  right     : 12px;
+  top       : 50%;
+  transform : translateY(-50%);
+  background: none;
+  border    : none;
+  cursor    : pointer;
+  color     : #a0aec0;
+  padding   : 0;
+  transition: color .2s;
+}
+.toggle-pass:hover { color: #40916c; }
+
+/* ── LOGIN BUTTON ── */
+.btn-login {
+  background   : #1b4332;
+  color        : #d4a853;
+  border       : none;
+  font-weight  : 700;
+  border-radius: 10px;
+  padding      : 12px;
+  font-size    : 15px;
+  display      : flex;
+  align-items  : center;
+  justify-content: center;
+  transition   : background .2s, transform .15s;
+}
+.btn-login:hover    { background: #2d6a4f; color: #d4a853; transform: translateY(-1px); }
+.btn-login:disabled { background: #a0b5a8; cursor: not-allowed; transform: none; }
+
+/* ── FOOTER LINK ── */
+.login-footer {
+  text-align : center;
+  margin-top : 20px;
+  font-size  : 13px;
+  color      : #718096;
+}
+.login-footer a {
+  color          : #1b4332;
+  font-weight    : 700;
+  text-decoration: none;
+}
+.login-footer a:hover { text-decoration: underline; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  .login-card { padding: 28px 20px; }
+}

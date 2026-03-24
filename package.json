@@ -1,0 +1,26 @@
+{
+  "name": "tenant-tracking-system",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "connect-mongo": "^6.0.0",
+    "dotenv": "^17.3.1",
+    "ejs": "^5.0.1",
+    "ejs-mate": "^4.0.0",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mate": "^0.21.0",
+    "method-override": "^3.0.0",
+    "mongoose": "^9.3.1",
+    "multer": "^2.1.1",
+    "path": "^0.12.7"
+  }
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — GramSeva</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/login.css"/>
+</head>
+<body>
+
+<div class="login-wrapper">
+  <div class="login-card">
+
+    <!-- Logo -->
+    <div class="login-logo">
+      <div class="logo-icon">
+        <svg width="36" height="36" viewBox="0 0 38 38" fill="none">
+          <rect width="38" height="38" rx="10" fill="#1b4332"/>
+          <path d="M19 7L9 14v16h6v-8h8v8h6V14L19 7z" fill="#d4a853"/>
+          <circle cx="19" cy="18" r="2.5" fill="#1b4332"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-mr">ग्रामसेवा</div>
+        <div class="logo-en">GramSeva</div>
+      </div>
+    </div>
+
+    <h5 class="login-title">Owner Login</h5>
+    <p class="login-sub">Sign in to manage your tenants</p>
+
+    <!-- Error message -->
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger rounded-3 small">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <!-- Login Form -->
+    <form action="/login" method="POST" id="loginForm">
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Email Address</label>
+        <input
+          type="email"
+          name="email"
+          class="form-control custom-input"
+          placeholder="Enter your email"
+          value="<%= typeof formData !== 'undefined' ? formData.email : '' %>"
+          required
+          autofocus
+        />
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Password</label>
+        <div class="password-wrap">
+          <input
+            type="password"
+            name="password"
+            id="passwordInput"
+            class="form-control custom-input"
+            placeholder="Enter your password"
+            required
+          />
+          <button type="button" class="toggle-pass" onclick="togglePassword()">
+            <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-login w-100">
+        Login
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ms-2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+    </form>
+
+    <div class="login-footer">
+      Not registered yet?
+      <a href="/register">Create an account</a>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/login.js"></script>
+</body>
+</html>
