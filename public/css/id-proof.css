@@ -1,0 +1,167 @@
+/* ============================================
+   id-proof.css
+   Styles for ID Proof form page
+   Place in: public/css/id-proof.css
+============================================ */
+
+body { background: #f4f6f3; min-height: 100vh; }
+
+/* ── CARD ── */
+.form-card {
+  background   : #ffffff;
+  border-radius: 20px;
+  padding      : 36px;
+  box-shadow   : 0 4px 24px rgba(27,67,50,.10);
+  margin       : 36px auto;
+  max-width    : 620px;
+}
+
+/* ── HEADER ── */
+.form-header {
+  display       : flex;
+  align-items   : center;
+  gap           : 14px;
+  margin-bottom : 20px;
+  padding-bottom: 18px;
+  border-bottom : 2px solid #d8f3dc;
+}
+
+.step-badge {
+  width          : 44px;
+  height         : 44px;
+  border-radius  : 12px;
+  background     : #d8f3dc;
+  color          : #1b4332;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  flex-shrink    : 0;
+}
+
+.form-title    { font-size: 20px; font-weight: 700; color: #1b4332; margin: 0; line-height: 1.2; }
+.form-subtitle { font-size: 13px; color: #718096; margin: 3px 0 0; }
+
+.step-pill {
+  margin-left  : auto;
+  background   : #1b4332;
+  color        : #d4a853;
+  font-size    : 12px;
+  font-weight  : 700;
+  padding      : 4px 12px;
+  border-radius: 100px;
+}
+
+/* ── TENANT BANNER ── */
+.tenant-banner {
+  display      : flex;
+  align-items  : center;
+  gap          : 8px;
+  background   : #d8f3dc;
+  color        : #1b4332;
+  font-size    : 13px;
+  font-weight  : 500;
+  padding      : 10px 16px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+.tenant-banner svg { flex-shrink: 0; color: #40916c; }
+
+/* ── SECTION LABELS ── */
+.section-label {
+  display       : flex;
+  align-items   : center;
+  gap           : 10px;
+  font-size     : 12px;
+  font-weight   : 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color         : #40916c;
+  margin        : 24px 0 14px;
+}
+.section-icon {
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 26px;
+  height         : 26px;
+  border-radius  : 6px;
+  background     : #d8f3dc;
+  color          : #1b4332;
+  font-size      : 11px;
+  font-weight    : 700;
+}
+.req { color: #dc3545; margin-left: 2px; }
+
+/* ── INPUTS ── */
+.custom-input {
+  border       : 1.5px solid #e2ddd4;
+  border-radius: 10px;
+  padding      : 10px 14px;
+  font-size    : 14px;
+  background   : #faf8f4;
+  transition   : border-color .2s, box-shadow .2s;
+}
+.custom-input:focus {
+  border-color: #40916c;
+  box-shadow  : 0 0 0 3px rgba(64,145,108,.12);
+  background  : #fff;
+  outline     : none;
+}
+.custom-input::placeholder { color: #b0bec5; }
+
+/* ── UPLOAD BOX ── */
+.upload-box {
+  border       : 2px dashed #b7e4c7;
+  border-radius: 12px;
+  padding      : 32px 24px;
+  text-align   : center;
+  cursor       : pointer;
+  background   : #f0faf4;
+  transition   : border-color .2s, background .2s;
+}
+.upload-box:hover        { border-color: #40916c; background: #e8f5ed; }
+.upload-box.has-image    { padding: 12px; border-style: solid; border-color: #40916c; }
+
+.upload-icon             { color: #74c69d; display: block; margin: 0 auto 10px; }
+.upload-box.has-image .upload-icon { display: none; }
+
+.upload-hint             { font-size: 14px; color: #4a5568; margin: 0; font-weight: 500; }
+.upload-hint-sub         { font-size: 12px; color: #a0aec0; margin: 4px 0 0; }
+.upload-box.has-image .upload-hint    { display: none; }
+.upload-box.has-image .upload-hint-sub { display: none; }
+
+.upload-preview          { display: none; width: 100%; max-height: 220px; object-fit: contain; border-radius: 8px; }
+.upload-preview.visible  { display: block; }
+
+/* ── FOOTER ── */
+.form-footer {
+  display        : flex;
+  justify-content: flex-end;
+  align-items    : center;
+  gap            : 12px;
+  margin-top     : 32px;
+  padding-top    : 20px;
+  border-top     : 1px solid #e8f5ed;
+}
+
+/* ── SUBMIT BUTTON ── */
+.btn-submit {
+  background   : #1b4332;
+  color        : #d4a853;
+  border       : none;
+  font-weight  : 700;
+  border-radius: 10px;
+  display      : flex;
+  align-items  : center;
+  transition   : background .2s, transform .15s;
+}
+.btn-submit:hover    { background: #2d6a4f; color: #d4a853; transform: translateY(-1px); }
+.btn-submit:disabled { background: #a0b5a8; cursor: not-allowed; transform: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 576px) {
+  .form-card   { padding: 22px 16px; margin: 16px auto; }
+  .form-footer { flex-direction: column; align-items: stretch; }
+  .form-footer .btn { width: 100%; justify-content: center; }
+  .step-pill   { display: none; }
+}
