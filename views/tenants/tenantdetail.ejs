@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/tenantdetail.css"/>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <a href="/dashboard" class="logo">
+        <svg width="30" height="30" viewBox="0 0 38 38" fill="none">
+          <rect width="38" height="38" rx="10" fill="#1b4332"/>
+          <path d="M19 7L9 14v16h6v-8h8v8h6V14L19 7z" fill="#d4a853"/>
+        </svg>
+        <span>GramSeva</span>
+      </a>
+      <div class="nav-right">
+        <span class="owner-name">
+          <%= typeof owner !== 'undefined' && owner ? owner.name : 'Owner' %>
+        </span>
+        <a href="/logout" class="logout-btn">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- Back link -->
+    <a href="/single" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back to Tenant List
+    </a>
+
+    <!-- ════════════════════════════════════
+         OVERALL INFO CARD  (blueprint box)
+    ════════════════════════════════════ -->
+    <div class="detail-card">
+
+      <!-- Top bar: Edit + Delete buttons (blueprint: edit | delete at top right) -->
+      <div class="detail-topbar">
+        <h5 class="detail-heading">Tenant Details</h5>
+        <div class="detail-actions">
+          <a href="/single/<%= tenant._id %>/edit" class="btn-edit">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit
+          </a>
+          <form action="/single/<%= tenant._id %>/delete" method="POST" style="display:inline" onsubmit="return confirmDelete()">
+            <button type="submit" class="btn-delete">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+              </svg>
+              Delete
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── PHOTO SECTION (blueprint: Photo box at top left) ── -->
+      <div class="photo-section">
+
+        <!-- Tenant uploaded photo -->
+        <div class="photo-block">
+          <div class="photo-label">Tenant Photo</div>
+          <% if (tenant.tenant_photo && tenant.tenant_photo.data) { %>
+            <img
+              src="data:<%= tenant.tenant_photo.mimetype %>;base64,<%= tenant.tenant_photo.data.toString('base64') %>"
+              alt="Tenant Photo"
+              class="main-photo"
+            />
+          <% } else { %>
+            <div class="photo-placeholder">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span>No Photo</span>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Live photo (blueprint: live photo) -->
+        <div class="photo-block">
+          <div class="photo-label">
+            Live Photo
+            <span class="live-badge">Live Capture</span>
+          </div>
+          <% if (tenant.live_photo && tenant.live_photo.data) { %>
+            <img
+              src="data:<%= tenant.live_photo.mimetype %>;base64,<%= tenant.live_photo.data.toString('base64') %>"
+              alt="Live Photo"
+              class="main-photo"
+            />
+          <% } else { %>
+            <div class="photo-placeholder">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              <span>Not Captured</span>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- ID proof image (blueprint: Id proof) -->
+        <div class="photo-block">
+          <div class="photo-label">ID Proof Image</div>
+          <% if (idProof && idProof.proof_image && idProof.proof_image.data) { %>
+            <img
+              src="data:<%= idProof.proof_image.mimetype %>;base64,<%= idProof.proof_image.data.toString('base64') %>"
+              alt="ID Proof"
+              class="main-photo id-proof-img"
+            />
+          <% } else { %>
+            <div class="photo-placeholder">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <path d="M2 10h20"/>
+              </svg>
+              <span>Not Uploaded</span>
+            </div>
+          <% } %>
+        </div>
+
+      </div>
+
+      <!-- ── ALL DETAILS (blueprint: name, owner name, id proof, id proof number, all details) ── -->
+      <div class="detail-body">
+
+        <!-- Section: Personal Info -->
+        <div class="detail-section">
+          <div class="section-title">Personal Information</div>
+          <div class="detail-grid">
+
+            <div class="detail-item">
+              <span class="detail-label">Name</span>
+              <span class="detail-value"><%= tenant.name %></span>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Phone</span>
+              <span class="detail-value"><%= tenant.phone %></span>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Occupation</span>
+              <span class="detail-value"><%= tenant.occupation %></span>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Status</span>
+              <span class="detail-value">
+                <span class="status-badge <%= tenant.status === 'active' ? 'badge-active' : 'badge-inactive' %>">
+                  <%= tenant.status === 'active' ? 'Active' : 'Inactive' %>
+                </span>
+              </span>
+            </div>
+
+            <div class="detail-item full-width">
+              <span class="detail-label">Permanent Address</span>
+              <span class="detail-value"><%= tenant.permanent_address %></span>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Registered On</span>
+              <span class="detail-value">
+                <%= new Date(tenant.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' }) %>
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Tenant ID</span>
+              <span class="detail-value uid">TEN-<%= tenant._id.toString().slice(-8).toUpperCase() %></span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section: Owner Info (blueprint: owner name) -->
+        <div class="detail-section">
+          <div class="section-title">Owner Information</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">Owner Name</span>
+              <span class="detail-value"><%= ownerInfo ? ownerInfo.name : 'N/A' %></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Owner Phone</span>
+              <span class="detail-value"><%= ownerInfo ? ownerInfo.phone : 'N/A' %></span>
+            </div>
+            <div class="detail-item full-width">
+              <span class="detail-label">Property Address</span>
+              <span class="detail-value"><%= ownerInfo ? ownerInfo.house_address : 'N/A' %></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: ID Proof (blueprint: Id proof, Id proof Number) -->
+        <div class="detail-section">
+          <div class="section-title">ID Proof Details</div>
+          <% if (idProof) { %>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">ID Proof Type</span>
+                <span class="detail-value"><%= idProof.id_proof_type %></span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">ID Proof Number</span>
+                <span class="detail-value uid"><%= idProof.id_proof_number %></span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Uploaded On</span>
+                <span class="detail-value">
+                  <%= new Date(idProof.uploaded_at || idProof.createdAt).toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' }) %>
+                </span>
+              </div>
+            </div>
+          <% } else { %>
+            <div class="no-proof">
+              <p>ID proof not uploaded yet.</p>
+              <a href="/single/<%= tenant._id %>/id-proof" class="btn-add-proof">
+                Upload ID Proof Now
+              </a>
+            </div>
+          <% } %>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function confirmDelete() {
+      return confirm("Are you sure you want to delete this tenant?\nThis action cannot be undone.");
+    }
+  </script>
+</body>
+</html>

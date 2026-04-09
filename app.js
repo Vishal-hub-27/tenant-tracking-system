@@ -418,6 +418,118 @@ app.post(
   }
 );
 
+// ─────────────────────────────────────────
+// GET /single
+// Tenant List Page — fetches all tenants
+// for logged-in owner from MongoDB
+// ─────────────────────────────────────────
+app.get("/single", isAuth, async (req, res) => {
+  try {
+    const ownerId = req.session.ownerId;
+
+    // .lean() is REQUIRED — converts Mongoose docs to plain JS
+    // objects so Buffer.toString('base64') works in EJS
+    const tenants = await SingleTenant.find({ owner_id: ownerId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.render("tenants/tenantlist", {
+      title  : "Tenant List",
+      tenants,
+    });
+
+  } catch (err) {
+    console.error("GET /single error:", err);
+    res.status(500).render("error", { message: "Could not load tenants." });
+  }
+});
+
+
+// ─────────────────────────────────────────
+// GET /single/:tenantId/detail
+// Overall Info Page — shows all details,
+// photos, ID proof for one tenant
+// ─────────────────────────────────────────
+app.get("/single/:tenantId/detail", isAuth, async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    const ownerId      = req.session.ownerId;
+
+    // Fetch tenant — .lean() for Buffer support in EJS
+    const tenant = await SingleTenant.findOne({
+      _id     : tenantId,
+      owner_id: ownerId,   // security: only show if belongs to this owner
+    }).lean();
+
+    if (!tenant) {
+      return res.status(404).render("error", {
+        message: "Tenant not found.",
+      });
+    }
+
+    // Fetch ID proof linked to this tenant
+    const idProof = await SingleIdProof.findOne({
+      tenant_id: tenantId,
+    }).lean();
+
+    // Fetch owner info to show on the page
+    const ownerInfo = await Owner.findById(ownerId)
+      .select("name phone house_address")
+      .lean();
+
+    res.render("tenants/tenantdetail", {
+      title    : `${tenant.name} — Details`,
+      tenant,
+      idProof,    // null if not uploaded yet — EJS handles this
+      ownerInfo,
+    });
+
+  } catch (err) {
+    console.error("GET /detail error:", err);
+    res.status(500).render("error", { message: "Could not load tenant details." });
+  }
+});
+
+
+// ─────────────────────────────────────────
+// POST /single/:tenantId/delete
+// Soft delete — sets status to inactive
+// ─────────────────────────────────────────
+app.post("/single/:tenantId/delete", isAuth, async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    const ownerId      = req.session.ownerId;
+
+    // Security: only delete if tenant belongs to this owner
+    const tenant = await SingleTenant.findOne({
+      _id     : tenantId,
+      owner_id: ownerId,
+    });
+
+    if (!tenant) {
+      return res.status(404).render("error", {
+        message: "Tenant not found or you do not have permission.",
+      });
+    }
+
+    // Soft delete
+    await SingleTenant.findByIdAndUpdate(tenantId, { status: "inactive" });
+
+    // Close stay history
+    await StayHistory.findOneAndUpdate(
+      { tenant_ref_id: tenantId, status: "active" },
+      { move_out_date: new Date(), status: "completed" }
+    );
+
+    // Redirect back to list
+    res.redirect("/single");
+
+  } catch (err) {
+    console.error("POST /delete error:", err);
+    res.status(500).render("error", { message: "Could not delete tenant." });
+  }
+});
+
 // ════════════════════════════════════════
 // ROUTE — SUCCESS PAGE
 // ════════════════════════════════════════

@@ -1,0 +1,298 @@
+/* ============================================
+   tenant-detail.css
+   Overall Info Page
+   Place in: public/css/tenant-detail.css
+============================================ */
+
+* { box-sizing: border-box; }
+
+body {
+  background : #f4f6f3;
+  min-height : 100vh;
+  margin     : 0;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── NAVBAR ── */
+.top-nav {
+  background: #1b4332;
+  position  : sticky;
+  top       : 0;
+  z-index   : 100;
+  box-shadow: 0 2px 12px rgba(13,35,24,.25);
+}
+.nav-inner {
+  max-width      : 900px;
+  margin         : 0 auto;
+  padding        : 0 20px;
+  height         : 60px;
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+}
+.logo {
+  display        : flex;
+  align-items    : center;
+  gap            : 10px;
+  text-decoration: none;
+  font-size      : 15px;
+  font-weight    : 700;
+  color          : #d4a853;
+}
+.nav-right   { display: flex; align-items: center; gap: 14px; }
+.owner-name  { color: #b7e4c7; font-size: 13px; font-weight: 600; }
+.logout-btn  {
+  color          : #d4a853;
+  font-size      : 12px;
+  font-weight    : 700;
+  text-decoration: none;
+  padding        : 5px 12px;
+  border         : 1.5px solid rgba(212,168,83,.4);
+  border-radius  : 8px;
+  transition     : all .2s;
+}
+.logout-btn:hover { background: rgba(212,168,83,.15); }
+
+/* ── PAGE WRAP ── */
+.page-wrap {
+  max-width: 900px;
+  margin   : 0 auto;
+  padding  : 24px 20px 60px;
+}
+
+/* ── BACK LINK ── */
+.back-link {
+  display        : inline-flex;
+  align-items    : center;
+  gap            : 6px;
+  font-size      : 12px;
+  color          : #718096;
+  text-decoration: none;
+  font-weight    : 600;
+  margin-bottom  : 16px;
+  transition     : color .2s;
+}
+.back-link:hover { color: #1b4332; }
+
+/* ── MAIN DETAIL CARD (blueprint box) ── */
+.detail-card {
+  background   : #ffffff;
+  border-radius: 18px;
+  box-shadow   : 0 4px 24px rgba(27,67,50,.10);
+  overflow     : hidden;
+}
+
+/* ── TOP BAR: heading + Edit + Delete (blueprint: edit | delete) ── */
+.detail-topbar {
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+  padding        : 18px 24px;
+  border-bottom  : 2px solid #f0faf4;
+  flex-wrap      : wrap;
+  gap            : 10px;
+}
+.detail-heading { font-size: 17px; font-weight: 700; color: #1b4332; margin: 0; }
+.detail-actions { display: flex; align-items: center; gap: 8px; }
+
+.btn-edit {
+  display        : inline-flex;
+  align-items    : center;
+  gap            : 5px;
+  font-size      : 13px;
+  font-weight    : 700;
+  color          : #854f0b;
+  background     : #faeeda;
+  border         : none;
+  padding        : 7px 16px;
+  border-radius  : 8px;
+  text-decoration: none;
+  cursor         : pointer;
+  transition     : background .18s;
+}
+.btn-edit:hover { background: #f0d5a0; color: #633806; }
+
+.btn-delete {
+  display    : inline-flex;
+  align-items: center;
+  gap        : 5px;
+  font-size  : 13px;
+  font-weight: 700;
+  color      : #a32d2d;
+  background : #fdecea;
+  border     : none;
+  padding    : 7px 16px;
+  border-radius: 8px;
+  cursor     : pointer;
+  transition : background .18s;
+}
+.btn-delete:hover { background: #f7c1c1; color: #791f1f; }
+
+/* ── PHOTO SECTION (blueprint: Photo box at top) ── */
+.photo-section {
+  display  : flex;
+  gap      : 20px;
+  padding  : 24px;
+  flex-wrap: wrap;
+  background: #faf8f4;
+  border-bottom: 2px solid #f0faf4;
+}
+
+.photo-block { display: flex; flex-direction: column; gap: 8px; }
+
+.photo-label {
+  font-size  : 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color      : #40916c;
+  display    : flex;
+  align-items: center;
+  gap        : 6px;
+}
+
+.live-badge {
+  font-size    : 10px;
+  font-weight  : 700;
+  background   : #d8f3dc;
+  color        : #1b4332;
+  padding      : 2px 7px;
+  border-radius: 100px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.main-photo {
+  width        : 130px;
+  height       : 130px;
+  object-fit   : cover;
+  border-radius: 12px;
+  border       : 2px solid #b7e4c7;
+}
+.id-proof-img {
+  width        : 180px;
+  height       : 130px;
+  object-fit   : contain;
+  border-radius: 10px;
+  background   : #f0faf4;
+}
+
+.photo-placeholder {
+  width          : 130px;
+  height         : 130px;
+  border-radius  : 12px;
+  background     : #f0faf4;
+  border         : 2px dashed #b7e4c7;
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+  justify-content: center;
+  gap            : 6px;
+}
+.photo-placeholder span { font-size: 11px; color: #a0aec0; font-weight: 600; }
+
+/* ── DETAIL BODY ── */
+.detail-body { padding: 0 24px 24px; }
+
+/* ── SECTION ── */
+.detail-section { padding: 20px 0; border-bottom: 1px solid #f0faf4; }
+.detail-section:last-child { border-bottom: none; }
+
+.section-title {
+  font-size     : 12px;
+  font-weight   : 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color         : #40916c;
+  margin-bottom : 14px;
+  display       : flex;
+  align-items   : center;
+  gap           : 8px;
+}
+.section-title::after {
+  content   : '';
+  flex      : 1;
+  height    : 1px;
+  background: #e8f5ed;
+}
+
+/* ── DETAIL GRID ── */
+.detail-grid {
+  display              : grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap                  : 14px;
+}
+.detail-item { display: flex; flex-direction: column; gap: 3px; }
+.full-width  { grid-column: 1 / -1; }
+
+.detail-label {
+  font-size  : 11px;
+  font-weight: 700;
+  color      : #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.detail-value {
+  font-size  : 14px;
+  font-weight: 600;
+  color      : #1a1f1c;
+  line-height: 1.5;
+}
+.uid {
+  font-family: monospace;
+  font-size  : 13px;
+  color      : #185fa5;
+  font-weight: 700;
+}
+
+/* ── STATUS BADGE ── */
+.status-badge {
+  font-size    : 11px;
+  font-weight  : 700;
+  padding      : 3px 10px;
+  border-radius: 100px;
+}
+.badge-active   { background: #d8f3dc; color: #1b4332; }
+.badge-inactive { background: #fdecea; color: #a32d2d; }
+
+/* ── NO PROOF ── */
+.no-proof {
+  background   : #faf8f4;
+  border       : 1.5px dashed #e2ddd4;
+  border-radius: 10px;
+  padding      : 20px;
+  display      : flex;
+  align-items  : center;
+  gap          : 16px;
+  flex-wrap    : wrap;
+}
+.no-proof p         { margin: 0; font-size: 13px; color: #718096; }
+.btn-add-proof {
+  display        : inline-flex;
+  align-items    : center;
+  gap            : 5px;
+  font-size      : 12px;
+  font-weight    : 700;
+  color          : #d4a853;
+  background     : #1b4332;
+  padding        : 7px 14px;
+  border-radius  : 8px;
+  text-decoration: none;
+  transition     : background .2s;
+}
+.btn-add-proof:hover { background: #2d6a4f; color: #d4a853; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .page-wrap        { padding: 16px 14px 40px; }
+  .detail-card      { border-radius: 14px; }
+  .detail-topbar    { padding: 14px 16px; }
+  .photo-section    { padding: 16px; gap: 14px; }
+  .main-photo       { width: 100px; height: 100px; }
+  .id-proof-img     { width: 140px; height: 100px; }
+  .photo-placeholder { width: 100px; height: 100px; }
+  .detail-body      { padding: 0 16px 16px; }
+  .detail-grid      { grid-template-columns: 1fr 1fr; }
+  .detail-actions   { gap: 6px; }
+  .btn-edit, .btn-delete { padding: 6px 12px; font-size: 12px; }
+}

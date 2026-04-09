@@ -1,0 +1,257 @@
+/* ============================================
+   tenant-list.css
+   Place in: public/css/tenant-list.css
+============================================ */
+
+* { box-sizing: border-box; }
+
+body {
+  background : #f4f6f3;
+  min-height : 100vh;
+  margin     : 0;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── NAVBAR ── */
+.top-nav {
+  background: #1b4332;
+  position  : sticky;
+  top       : 0;
+  z-index   : 100;
+  box-shadow: 0 2px 12px rgba(13,35,24,.25);
+}
+.nav-inner {
+  max-width      : 900px;
+  margin         : 0 auto;
+  padding        : 0 20px;
+  height         : 60px;
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+}
+.logo {
+  display        : flex;
+  align-items    : center;
+  gap            : 10px;
+  text-decoration: none;
+  font-size      : 15px;
+  font-weight    : 700;
+  color          : #d4a853;
+}
+.nav-right      { display: flex; align-items: center; gap: 14px; }
+.owner-name     { display: flex; align-items: center; gap: 6px; color: #b7e4c7; font-size: 13px; font-weight: 600; }
+.logout-btn     { color: #d4a853; font-size: 12px; font-weight: 700; text-decoration: none; padding: 5px 12px; border: 1.5px solid rgba(212,168,83,.4); border-radius: 8px; transition: all .2s; }
+.logout-btn:hover { background: rgba(212,168,83,.15); }
+
+/* ── PAGE ── */
+.page-wrap {
+  max-width: 900px;
+  margin   : 0 auto;
+  padding  : 28px 20px 60px;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  display        : flex;
+  align-items    : flex-end;
+  justify-content: space-between;
+  flex-wrap      : wrap;
+  gap            : 12px;
+  margin-bottom  : 20px;
+}
+.back-link {
+  display        : flex;
+  align-items    : center;
+  gap            : 5px;
+  font-size      : 12px;
+  color          : #718096;
+  text-decoration: none;
+  font-weight    : 600;
+  margin-bottom  : 5px;
+}
+.back-link:hover  { color: #1b4332; }
+.page-title       { font-size: 20px; font-weight: 700; color: #1b4332; margin: 0 0 4px; }
+.page-sub         { font-size: 13px; color: #718096; margin: 0; }
+.page-sub strong  { color: #1b4332; }
+
+/* ── ADD BUTTON ── */
+.btn-add {
+  display        : inline-flex;
+  align-items    : center;
+  gap            : 7px;
+  background     : #1b4332;
+  color          : #d4a853;
+  border         : none;
+  font-weight    : 700;
+  font-size      : 13px;
+  padding        : 10px 20px;
+  border-radius  : 10px;
+  text-decoration: none;
+  white-space    : nowrap;
+  cursor         : pointer;
+  transition     : background .2s, transform .15s;
+}
+.btn-add:hover { background: #2d6a4f; color: #d4a853; transform: translateY(-1px); }
+
+/* ── SEARCH ── */
+.search-wrap {
+  position     : relative;
+  margin-bottom: 20px;
+}
+.s-icon {
+  position      : absolute;
+  left          : 12px;
+  top           : 50%;
+  transform     : translateY(-50%);
+  color         : #a0aec0;
+  pointer-events: none;
+}
+.search-wrap input {
+  width        : 100%;
+  max-width    : 380px;
+  padding      : 9px 14px 9px 36px;
+  border       : 1.5px solid #e2ddd4;
+  border-radius: 10px;
+  font-size    : 13px;
+  background   : #fff;
+  outline      : none;
+  transition   : border-color .2s;
+}
+.search-wrap input:focus { border-color: #40916c; }
+
+/* ── TENANT LIST ── */
+.tenant-list {
+  display       : flex;
+  flex-direction: column;
+  gap           : 10px;
+}
+
+/* ── TENANT ROW  (blueprint: [Photo | Name=, phone, address]) ── */
+.tenant-row {
+  display     : flex;
+  align-items : center;
+  gap         : 14px;
+  background  : #ffffff;
+  border      : 1.5px solid #e8f5ed;
+  border-radius: 14px;
+  padding     : 14px 16px;
+  box-shadow  : 0 1px 6px rgba(27,67,50,.06);
+  transition  : transform .2s ease, box-shadow .2s ease;
+  cursor      : default;
+}
+.tenant-row:hover {
+  transform : translateY(-2px);
+  box-shadow: 0 6px 20px rgba(27,67,50,.12);
+  border-color: #b7e4c7;
+}
+
+/* Serial number */
+.row-serial {
+  font-size  : 12px;
+  font-weight: 700;
+  color      : #a0aec0;
+  min-width  : 22px;
+  text-align : center;
+}
+
+/* Photo — left side as in blueprint */
+.row-photo { flex-shrink: 0; }
+.row-img {
+  width        : 62px;
+  height       : 62px;
+  border-radius: 10px;
+  object-fit   : cover;
+  border       : 2px solid #b7e4c7;
+  display      : block;
+}
+.row-img-placeholder {
+  width          : 62px;
+  height         : 62px;
+  border-radius  : 10px;
+  background     : #f0faf4;
+  border         : 2px solid #b7e4c7;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+}
+
+/* Info — right side as in blueprint */
+.row-info   { flex: 1; min-width: 0; }
+.row-name   { font-size: 15px; font-weight: 700; color: #1b4332; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row-meta   { display: flex; flex-wrap: wrap; gap: 10px; }
+.row-meta span {
+  display    : flex;
+  align-items: center;
+  gap        : 4px;
+  font-size  : 12px;
+  color      : #718096;
+}
+.row-meta svg    { color: #74c69d; flex-shrink: 0; }
+.row-address     { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Right side — status + view button */
+.row-right {
+  display       : flex;
+  flex-direction: column;
+  align-items   : flex-end;
+  gap           : 8px;
+  flex-shrink   : 0;
+}
+.status-dot {
+  font-size    : 11px;
+  font-weight  : 700;
+  padding      : 3px 10px;
+  border-radius: 100px;
+}
+.dot-active   { background: #d8f3dc; color: #1b4332; }
+.dot-inactive { background: #fdecea; color: #a32d2d; }
+
+/* View button — the arrow in blueprint */
+.view-btn {
+  display        : flex;
+  align-items    : center;
+  gap            : 5px;
+  font-size      : 12px;
+  font-weight    : 700;
+  color          : #185fa5;
+  text-decoration: none;
+  padding        : 5px 12px;
+  border-radius  : 8px;
+  background     : #e6f1fb;
+  transition     : background .18s;
+  white-space    : nowrap;
+}
+.view-btn:hover { background: #b5d4f4; color: #0c447c; }
+
+/* ── EMPTY STATE ── */
+.empty-box {
+  text-align   : center;
+  padding      : 60px 24px;
+  background   : #ffffff;
+  border-radius: 16px;
+  box-shadow   : 0 2px 10px rgba(27,67,50,.07);
+}
+.empty-icon {
+  width          : 72px;
+  height         : 72px;
+  border-radius  : 50%;
+  background     : #f0faf4;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  margin         : 0 auto 16px;
+}
+.empty-title { font-size: 16px; font-weight: 700; color: #1b4332; margin-bottom: 6px; }
+.empty-sub   { font-size: 13px; color: #718096; }
+
+/* ── NO RESULTS ── */
+.no-results { text-align: center; padding: 28px; color: #718096; font-size: 13px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .btn-add     { width: 100%; justify-content: center; }
+  .row-address { display: none; }
+  .row-img, .row-img-placeholder { width: 52px; height: 52px; }
+  .row-name    { font-size: 14px; }
+}
