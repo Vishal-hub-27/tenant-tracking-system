@@ -1,0 +1,261 @@
+/* ============================================
+   edit-tenant.css
+   Edit Single Tenant Page
+   Place in: public/css/edit-tenant.css
+============================================ */
+
+* { box-sizing: border-box; }
+
+body {
+  background : #f4f6f3;
+  min-height : 100vh;
+  margin     : 0;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── NAVBAR ── */
+.top-nav {
+  background: #1b4332;
+  position  : sticky;
+  top       : 0;
+  z-index   : 100;
+  box-shadow: 0 2px 12px rgba(13,35,24,.25);
+}
+.nav-inner {
+  max-width      : 780px;
+  margin         : 0 auto;
+  padding        : 0 20px;
+  height         : 60px;
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+}
+.logo {
+  display        : flex;
+  align-items    : center;
+  gap            : 10px;
+  text-decoration: none;
+  font-size      : 15px;
+  font-weight    : 700;
+  color          : #d4a853;
+}
+.nav-right   { display: flex; align-items: center; gap: 14px; }
+.owner-name  { color: #b7e4c7; font-size: 13px; font-weight: 600; }
+.logout-btn  {
+  color          : #d4a853;
+  font-size      : 12px;
+  font-weight    : 700;
+  text-decoration: none;
+  padding        : 5px 12px;
+  border         : 1.5px solid rgba(212,168,83,.4);
+  border-radius  : 8px;
+  transition     : all .2s;
+}
+.logout-btn:hover { background: rgba(212,168,83,.15); }
+
+/* ── PAGE WRAP ── */
+.page-wrap {
+  max-width: 780px;
+  margin   : 0 auto;
+  padding  : 24px 20px 60px;
+}
+
+/* ── BACK LINK ── */
+.back-link {
+  display        : inline-flex;
+  align-items    : center;
+  gap            : 6px;
+  font-size      : 12px;
+  color          : #718096;
+  text-decoration: none;
+  font-weight    : 600;
+  margin-bottom  : 16px;
+  transition     : color .2s;
+}
+.back-link:hover { color: #1b4332; }
+
+/* ── EDIT CARD ── */
+.edit-card {
+  background   : #ffffff;
+  border-radius: 18px;
+  padding      : 32px;
+  box-shadow   : 0 4px 24px rgba(27,67,50,.10);
+}
+
+/* ── HEADER ── */
+.edit-header {
+  display       : flex;
+  align-items   : center;
+  gap           : 14px;
+  margin-bottom : 28px;
+  padding-bottom: 20px;
+  border-bottom : 2px solid #d8f3dc;
+}
+.edit-header-icon {
+  width          : 44px;
+  height         : 44px;
+  border-radius  : 12px;
+  background     : #faeeda;
+  color          : #854f0b;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  flex-shrink    : 0;
+}
+.edit-title { font-size: 20px; font-weight: 700; color: #1b4332; margin: 0 0 3px; }
+.edit-sub   { font-size: 13px; color: #718096; margin: 0; }
+.edit-sub strong { color: #1b4332; }
+
+/* ── SECTION LABELS ── */
+.section-label {
+  display       : flex;
+  align-items   : center;
+  gap           : 10px;
+  font-size     : 11px;
+  font-weight   : 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color         : #40916c;
+  margin        : 24px 0 14px;
+}
+.section-num {
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 24px;
+  height         : 24px;
+  border-radius  : 6px;
+  background     : #d8f3dc;
+  color          : #1b4332;
+  font-size      : 11px;
+  font-weight    : 700;
+}
+.optional-tag {
+  font-size      : 10px;
+  font-weight    : 600;
+  background     : #faf8f4;
+  color          : #a0aec0;
+  border         : 1px solid #e2ddd4;
+  padding        : 2px 8px;
+  border-radius  : 100px;
+  text-transform : none;
+  letter-spacing : 0;
+  margin-left    : auto;
+}
+
+/* ── REQUIRED ASTERISK ── */
+.req { color: #dc3545; margin-left: 2px; }
+
+/* ── INPUTS ── */
+.custom-input {
+  border       : 1.5px solid #e2ddd4;
+  border-radius: 10px;
+  padding      : 10px 14px;
+  font-size    : 14px;
+  background   : #faf8f4;
+  transition   : border-color .2s, box-shadow .2s;
+}
+.custom-input:focus {
+  border-color: #40916c;
+  box-shadow  : 0 0 0 3px rgba(64,145,108,.12);
+  background  : #fff;
+  outline     : none;
+}
+.custom-input::placeholder { color: #b0bec5; }
+
+/* ── CURRENT PHOTO ROW ── */
+.current-photo-row {
+  display    : flex;
+  align-items: flex-start;
+  gap        : 18px;
+  background : #faf8f4;
+  border     : 1.5px solid #e2ddd4;
+  border-radius: 12px;
+  padding    : 16px;
+  margin-bottom: 8px;
+  flex-wrap  : wrap;
+}
+.current-photo-wrap { flex-shrink: 0; }
+
+.current-photo {
+  width        : 80px;
+  height       : 80px;
+  object-fit   : cover;
+  border-radius: 10px;
+  border       : 2px solid #b7e4c7;
+  display      : block;
+}
+.current-photo.id-img {
+  width : 120px;
+  height: 80px;
+  object-fit: contain;
+  background: #f0faf4;
+}
+.photo-placeholder {
+  width          : 80px;
+  height         : 80px;
+  border-radius  : 10px;
+  background     : #f0faf4;
+  border         : 2px dashed #b7e4c7;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+}
+
+.current-photo-info { flex: 1; min-width: 0; }
+.current-label { font-size: 12px; font-weight: 700; color: #1b4332; margin-bottom: 4px; }
+.current-hint  { font-size: 12px; color: #718096; margin-bottom: 10px; line-height: 1.5; }
+
+/* Upload trigger button */
+.upload-trigger {
+  display      : inline-flex;
+  align-items  : center;
+  gap          : 6px;
+  font-size    : 12px;
+  font-weight  : 700;
+  color        : #1b4332;
+  background   : #d8f3dc;
+  border       : none;
+  padding      : 7px 14px;
+  border-radius: 8px;
+  cursor       : pointer;
+  transition   : background .18s;
+}
+.upload-trigger:hover { background: #b7e4c7; }
+
+/* ── FOOTER ── */
+.edit-footer {
+  display        : flex;
+  justify-content: flex-end;
+  align-items    : center;
+  gap            : 12px;
+  margin-top     : 32px;
+  padding-top    : 20px;
+  border-top     : 1px solid #e8f5ed;
+}
+
+/* ── SAVE BUTTON ── */
+.btn-save {
+  display      : inline-flex;
+  align-items  : center;
+  gap          : 7px;
+  background   : #1b4332;
+  color        : #d4a853;
+  border       : none;
+  font-weight  : 700;
+  font-size    : 14px;
+  padding      : 11px 28px;
+  border-radius: 10px;
+  cursor       : pointer;
+  transition   : background .2s, transform .15s;
+}
+.btn-save:hover    { background: #2d6a4f; color: #d4a853; transform: translateY(-1px); }
+.btn-save:disabled { background: #a0b5a8; cursor: not-allowed; transform: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 580px) {
+  .edit-card    { padding: 20px 16px; }
+  .edit-footer  { flex-direction: column; align-items: stretch; }
+  .edit-footer .btn, .btn-save { width: 100%; justify-content: center; }
+  .current-photo-row { flex-direction: column; }
+}

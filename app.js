@@ -4,13 +4,17 @@ const path= require("path");
 const multer= require("multer");
 const bcrypt= require("bcryptjs");
 const session= require("express-session");
-const MongoStore   = require("connect-mongo").default;
+const MongoStore= require("connect-mongo").default;
+const methodOverride = require("method-override");
 require("dotenv").config();
 
 const Owner         = require("./models/owner");
 const SingleTenant  = require("./models/singletenant");
 const SingleIdProof = require("./models/singleidProof");
 const StayHistory   = require("./models/stayhistory");
+const FamilyHead    = require("./models/familyhead");
+const FamilyMember  = require("./models/familymember");
+const FamilyIdProof = require("./models/familyproof");
 const isAuth        = require("./middleware/isAuth");
 
 const app = express();
@@ -20,6 +24,7 @@ const app = express();
 // ════════════════════════════════════════
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));  
 app.use(express.static(path.join(__dirname, "public")));
 
 // ════════════════════════════════════════
@@ -546,6 +551,517 @@ app.get("/single/:tenantId/success", isAuth, async (req, res) => {
     });
   } catch (err) {
     res.status(500).render("error", { message: "Something went wrong." });
+  }
+});
+
+// ════════════════════════════════════════
+// ADD THESE 2 THINGS TO YOUR app.js
+// ════════════════════════════════════════
+
+// ── STEP 1: Install and add method-override ──
+// Run: npm install method-override
+// Then add at top of app.js:
+//
+// const methodOverride = require("method-override");
+// app.use(methodOverride("_method"));
+//
+// This allows HTML forms to send PUT requests
+// by adding ?_method=PUT to the form action.
+// Without this, HTML forms can only POST.
+
+
+// ─────────────────────────────────────────
+// GET /single/:tenantId/edit
+// Open the edit form — pre-filled with
+// current tenant data from MongoDB
+// ─────────────────────────────────────────
+app.get("/single/:tenantId/edit", isAuth, async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    const ownerId      = req.session.ownerId;
+
+    // Fetch tenant — .lean() for Buffer support in EJS
+    const tenant = await SingleTenant.findOne({
+      _id     : tenantId,
+      owner_id: ownerId,
+    }).lean();
+
+    if (!tenant) {
+      return res.status(404).render("error", {
+        message: "Tenant not found.",
+      });
+    }
+
+    // Fetch existing ID proof to pre-fill the form
+    const idProof = await SingleIdProof.findOne({
+      tenant_id: tenantId,
+    }).lean();
+
+    res.render("tenants/singletenantedit", {
+      title  : `Edit — ${tenant.name}`,
+      tenant,
+      idProof,  // null if no proof yet — EJS handles this
+      errors : [],
+    });
+
+  } catch (err) {
+    console.error("GET /edit error:", err);
+    res.status(500).render("error", { message: "Could not load edit form." });
+  }
+});
+
+
+// ─────────────────────────────────────────
+// PUT /single/:tenantId
+// Save updated tenant data to MongoDB
+// Handles: text fields + optional new photos
+// ─────────────────────────────────────────
+app.put(
+  "/single/:tenantId",
+  isAuth,
+  upload.fields([
+    { name: "tenant_photo", maxCount: 1 },  // optional — only if new photo uploaded
+    { name: "proof_image",  maxCount: 1 },  // optional — only if new proof uploaded
+  ]),
+  async (req, res) => {
+    try {
+      const { tenantId } = req.params;
+      const ownerId      = req.session.ownerId;
+
+      const {
+        name,
+        phone,
+        occupation,
+        permanent_address,
+        id_proof_type,
+        id_proof_number,
+      } = req.body;
+
+      // ── Validate ──
+      const errors = [];
+      if (!name?.trim())                errors.push({ msg: "Name is required" });
+      if (!phone?.trim())               errors.push({ msg: "Phone is required" });
+      if (phone && phone.length !== 10) errors.push({ msg: "Phone must be 10 digits" });
+      if (!occupation?.trim())          errors.push({ msg: "Occupation is required" });
+      if (!permanent_address?.trim())   errors.push({ msg: "Permanent address is required" });
+
+      if (errors.length > 0) {
+        // Re-fetch tenant and idProof to re-render form with errors
+        const tenant  = await SingleTenant.findById(tenantId).lean();
+        const idProof = await SingleIdProof.findOne({ tenant_id: tenantId }).lean();
+        return res.render("tenants/edit", {
+          title  : `Edit — ${tenant?.name}`,
+          tenant,
+          idProof,
+          errors,
+        });
+      }
+
+      // ── Build update object for tenant ──
+      const tenantUpdate = {
+        name             : name.trim(),
+        phone            : phone.trim(),
+        occupation       : occupation.trim(),
+        permanent_address: permanent_address.trim(),
+      };
+
+      // Only update photo if a new file was uploaded
+      const newPhotoFile = req.files?.tenant_photo?.[0];
+      if (newPhotoFile) {
+        tenantUpdate.tenant_photo = {
+          data    : newPhotoFile.buffer,
+          mimetype: newPhotoFile.mimetype,
+          filename: newPhotoFile.originalname,
+        };
+      }
+
+      // ── Update SingleTenant ──
+      await SingleTenant.findOneAndUpdate(
+        { _id: tenantId, owner_id: ownerId },  // security check
+        tenantUpdate,
+        { new: true }
+      );
+
+      // ── Update SingleIdProof if fields provided ──
+      const newProofFile = req.files?.proof_image?.[0];
+      const hasProofUpdate = id_proof_type || id_proof_number?.trim() || newProofFile;
+
+      if (hasProofUpdate) {
+        const proofUpdate = {};
+
+        if (id_proof_type)          proofUpdate.id_proof_type   = id_proof_type;
+        if (id_proof_number?.trim()) proofUpdate.id_proof_number = id_proof_number.trim();
+        if (newProofFile) {
+          proofUpdate.proof_image = {
+            data    : newProofFile.buffer,
+            mimetype: newProofFile.mimetype,
+            filename: newProofFile.originalname,
+          };
+        }
+
+        // Update existing proof OR create new one if not exists
+        await SingleIdProof.findOneAndUpdate(
+          { tenant_id: tenantId },
+          proofUpdate,
+          { upsert: true, new: true }  // upsert = create if not found
+        );
+      }
+
+      // ── Redirect to detail page ──
+      res.redirect(`/single/${tenantId}/detail`);
+
+    } catch (err) {
+      console.error("PUT /single/:tenantId error:", err);
+      res.status(500).render("error", { message: "Could not save changes." });
+    }
+  }
+);  
+
+
+// ════════════════════════════════════════════════════════
+// FAMILY ROUTES — add all of these to your app.js
+// ════════════════════════════════════════════════════════
+
+
+// ─────────────────────────────────────────
+// GET /family
+// List all families for logged-in owner
+// ─────────────────────────────────────────
+app.get("/family", isAuth, async (req, res) => {
+  try {
+    const families = await FamilyHead
+      .find({ owner_id: req.session.ownerId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.render("family/family-list", {
+      title   : "Family Tenants",
+      families,
+    });
+  } catch (err) {
+    console.error("GET /family error:", err);
+    res.status(500).render("error", { message: "Could not load families." });
+  }
+});
+
+
+// ─────────────────────────────────────────
+// GET /family/add
+// Open Add Family Head form
+// ─────────────────────────────────────────
+app.get("owners/family/add", isAuth, (req, res) => {
+  res.render("family/add-family-head", {
+    title   : "Add Family Head",
+    errors  : [],
+    formData: {},
+  });
+});
+
+
+// ─────────────────────────────────────────
+// POST /family/add
+// Save family head to MongoDB
+// ─────────────────────────────────────────
+app.post(
+  "/family/add",
+  isAuth,
+  upload.fields([{ name: "head_photo", maxCount: 1 }]),
+  async (req, res) => {
+    try {
+      const ownerId = req.session.ownerId;
+      const { head_name, phone, occupation, permanent_address, live_photo_base64 } = req.body;
+      const headPhotoFile = req.files?.head_photo?.[0];
+
+      // Validate
+      const errors = [];
+      if (!head_name?.trim())           errors.push({ msg: "Name is required" });
+      if (!phone?.trim())               errors.push({ msg: "Phone is required" });
+      if (phone && phone.length !== 10) errors.push({ msg: "Phone must be 10 digits" });
+      if (!occupation?.trim())          errors.push({ msg: "Occupation is required" });
+      if (!permanent_address?.trim())   errors.push({ msg: "Address is required" });
+      if (!headPhotoFile)               errors.push({ msg: "Head photo is required" });
+      if (!live_photo_base64)           errors.push({ msg: "Live photo capture is required" });
+
+      if (errors.length > 0) {
+        return res.render("family/add-head", {
+          title   : "Add Family Head",
+          errors,
+          formData: { head_name, phone, occupation, permanent_address },
+        });
+      }
+
+      // Save FamilyHead
+      const family = await FamilyHead.create({
+        owner_id         : ownerId,
+        head_name        : head_name.trim(),
+        phone            : phone.trim(),
+        occupation       : occupation.trim(),
+        permanent_address: permanent_address.trim(),
+        head_photo: {
+          data    : headPhotoFile.buffer,
+          mimetype: headPhotoFile.mimetype,
+          filename: headPhotoFile.originalname,
+        },
+        live_photo: {
+          data       : base64ToBuffer(live_photo_base64),
+          mimetype   : "image/jpeg",
+          captured_at: new Date(),
+        },
+        total_members: 0,
+      });
+
+      // Redirect to ID proof
+      res.redirect(`/family/${family._id}/id-proof`);
+
+    } catch (err) {
+      console.error("POST /family/add error:", err);
+      res.status(500).render("error", { message: "Could not save family head." });
+    }
+  }
+);
+
+
+// ─────────────────────────────────────────
+// GET /family/:familyId/id-proof
+// Open family ID proof form
+// ─────────────────────────────────────────
+app.get("/family/:familyId/id-proof", isAuth, async (req, res) => {
+  try {
+    const family = await FamilyHead.findById(req.params.familyId).lean();
+    if (!family) return res.status(404).render("error", { message: "Family not found." });
+
+    res.render("family/family-id-proof", {
+      title   : "Family ID Proof",
+      familyId: req.params.familyId,
+      headName: family.head_name,
+      errors  : [],
+      formData: {},
+    });
+  } catch (err) {
+    res.status(500).render("error", { message: "Something went wrong." });
+  }
+});
+
+
+// ─────────────────────────────────────────
+// POST /family/:familyId/id-proof
+// Save family ID proof
+// ─────────────────────────────────────────
+app.post(
+  "/family/:familyId/id-proof",
+  isAuth,
+  upload.fields([{ name: "proof_image", maxCount: 1 }]),
+  async (req, res) => {
+    try {
+      const { familyId } = req.params;
+      const { id_proof_type, id_proof_number } = req.body;
+      const proofFile = req.files?.proof_image?.[0];
+
+      const errors = [];
+      if (!id_proof_type)           errors.push({ msg: "Please select ID proof type" });
+      if (!id_proof_number?.trim()) errors.push({ msg: "ID proof number is required" });
+      if (!proofFile)               errors.push({ msg: "Please upload proof image" });
+
+      if (errors.length > 0) {
+        const family = await FamilyHead.findById(familyId).lean();
+        return res.render("family/family-id-proof", {
+          title   : "Family ID Proof",
+          familyId,
+          headName: family?.head_name || "",
+          errors,
+          formData: { id_proof_type, id_proof_number },
+        });
+      }
+
+      await FamilyIdProof.create({
+        family_id      : familyId,
+        id_proof_type,
+        id_proof_number: id_proof_number.trim(),
+        proof_image: {
+          data    : proofFile.buffer,
+          mimetype: proofFile.mimetype,
+          filename: proofFile.originalname,
+        },
+        uploaded_at: new Date(),
+      });
+
+      // Redirect to family detail page
+      res.redirect(`/family/${familyId}/detail`);
+
+    } catch (err) {
+      console.error("POST /family/id-proof error:", err);
+      res.status(500).render("error", { message: "Could not save ID proof." });
+    }
+  }
+);
+
+
+// ─────────────────────────────────────────
+// GET /family/:familyId/detail
+// Family detail page — head + all members
+// ─────────────────────────────────────────
+app.get("/family/:familyId/detail", isAuth, async (req, res) => {
+  try {
+    const { familyId } = req.params;
+    const ownerId      = req.session.ownerId;
+
+    const head = await FamilyHead.findOne({
+      _id     : familyId,
+      owner_id: ownerId,
+    }).lean();
+
+    if (!head) return res.status(404).render("error", { message: "Family not found." });
+
+    const idProof = await FamilyIdProof.findOne({ family_id: familyId }).lean();
+    const members = await FamilyMember.find({ family_id: familyId }).lean();
+
+    res.render("family/family-detail", {
+      title  : `${head.head_name}'s Family`,
+      head,
+      idProof,
+      members,
+    });
+  } catch (err) {
+    console.error("GET /family/detail error:", err);
+    res.status(500).render("error", { message: "Could not load family." });
+  }
+});
+
+
+// ─────────────────────────────────────────
+// GET /family/:familyId/members/add
+// Open Add Member form
+// ─────────────────────────────────────────
+app.get("/family/:familyId/members/add", isAuth, async (req, res) => {
+  try {
+    const { familyId } = req.params;
+    const family = await FamilyHead.findById(familyId).lean();
+    if (!family) return res.status(404).render("error", { message: "Family not found." });
+
+    res.render("family/add-member", {
+      title   : "Add Family Member",
+      familyId,
+      headName: family.head_name,
+      errors  : [],
+      formData: {},
+    });
+  } catch (err) {
+    res.status(500).render("error", { message: "Something went wrong." });
+  }
+});
+
+
+// ─────────────────────────────────────────
+// POST /family/:familyId/members/add
+// Save new family member
+// ─────────────────────────────────────────
+app.post(
+  "/family/:familyId/members/add",
+  isAuth,
+  upload.fields([{ name: "member_photo", maxCount: 1 }]),
+  async (req, res) => {
+    try {
+      const { familyId } = req.params;
+      const { name, age, relation, occupation, phone } = req.body;
+      const memberPhotoFile = req.files?.member_photo?.[0];
+
+      // Validate
+      const errors = [];
+      if (!name?.trim())  errors.push({ msg: "Member name is required" });
+      if (!age)           errors.push({ msg: "Age is required" });
+      if (!relation)      errors.push({ msg: "Relation is required" });
+
+      if (errors.length > 0) {
+        const family = await FamilyHead.findById(familyId).lean();
+        return res.render("family/add-member", {
+          title   : "Add Family Member",
+          familyId,
+          headName: family?.head_name || "",
+          errors,
+          formData: { name, age, relation, occupation, phone },
+        });
+      }
+
+      // Build member object
+      const memberData = {
+        family_id : familyId,
+        name      : name.trim(),
+        age       : Number(age),
+        relation,
+        occupation: occupation?.trim() || "Not specified",
+        phone     : phone?.trim() || "",
+      };
+
+      // Add photo only if uploaded
+      if (memberPhotoFile) {
+        memberData.member_photo = {
+          data    : memberPhotoFile.buffer,
+          mimetype: memberPhotoFile.mimetype,
+          filename: memberPhotoFile.originalname,
+        };
+      }
+
+      await FamilyMember.create(memberData);
+
+      // Increment total_members on family head
+      await FamilyHead.findByIdAndUpdate(familyId, {
+        $inc: { total_members: 1 },
+      });
+
+      // Redirect back to family detail
+      res.redirect(`/family/${familyId}/detail`);
+
+    } catch (err) {
+      console.error("POST /members/add error:", err);
+      res.status(500).render("error", { message: "Could not save member." });
+    }
+  }
+);
+
+
+// ─────────────────────────────────────────
+// POST /family/:familyId/members/:memberId/delete
+// Remove a member from family
+// ─────────────────────────────────────────
+app.post("/family/:familyId/members/:memberId/delete", isAuth, async (req, res) => {
+  try {
+    const { familyId, memberId } = req.params;
+
+    await FamilyMember.findByIdAndDelete(memberId);
+
+    // Decrement total_members
+    await FamilyHead.findByIdAndUpdate(familyId, {
+      $inc: { total_members: -1 },
+    });
+
+    res.redirect(`/family/${familyId}/detail`);
+
+  } catch (err) {
+    console.error("POST /members/delete error:", err);
+    res.status(500).render("error", { message: "Could not remove member." });
+  }
+});
+
+
+// ─────────────────────────────────────────
+// POST /family/:familyId/delete
+// Soft delete entire family
+// ─────────────────────────────────────────
+app.post("/family/:familyId/delete", isAuth, async (req, res) => {
+  try {
+    const { familyId } = req.params;
+    const ownerId      = req.session.ownerId;
+
+    const family = await FamilyHead.findOne({ _id: familyId, owner_id: ownerId });
+    if (!family) return res.status(404).render("error", { message: "Family not found." });
+
+    await FamilyHead.findByIdAndUpdate(familyId, { status: "inactive" });
+
+    res.redirect("/family");
+
+  } catch (err) {
+    console.error("POST /family/delete error:", err);
+    res.status(500).render("error", { message: "Could not delete family." });
   }
 });
 

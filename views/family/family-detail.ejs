@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/family.css"/>
+</head>
+<body>
+
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <a href="/dashboard" class="logo">
+        <svg width="30" height="30" viewBox="0 0 38 38" fill="none">
+          <rect width="38" height="38" rx="10" fill="#1b4332"/>
+          <path d="M19 7L9 14v16h6v-8h8v8h6V14L19 7z" fill="#d4a853"/>
+        </svg>
+        <span>GramSeva</span>
+      </a>
+      <div class="nav-right">
+        <span class="owner-name"><%= typeof owner !== 'undefined' && owner ? owner.name : 'Owner' %></span>
+        <a href="/logout" class="logout-btn">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+
+    <a href="/family" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Family List
+    </a>
+
+    <!-- ── FAMILY HEAD CARD ── -->
+    <div class="detail-card">
+
+      <!-- Top bar -->
+      <div class="detail-topbar">
+        <div class="topbar-left">
+          <span class="family-tag">Family</span>
+          <h5 class="detail-title"><%= head.head_name %></h5>
+          <span class="member-count">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+            <%= members.length %> member<%= members.length !== 1 ? 's' : '' %>
+          </span>
+        </div>
+        <div class="topbar-right">
+          <a href="/family/<%= head._id %>/edit" class="btn-edit">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            Edit Head
+          </a>
+          <form action="/family/<%= head._id %>/delete" method="POST" style="display:inline" onsubmit="return confirm('Delete this family and all members?')">
+            <button type="submit" class="btn-delete">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+              </svg>
+              Delete
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Head photos row -->
+      <div class="photos-row">
+        <div class="photo-col">
+          <div class="photo-lbl">Head Photo</div>
+          <% if (head.head_photo && head.head_photo.data) { %>
+            <img src="data:<%= head.head_photo.mimetype %>;base64,<%= head.head_photo.data.toString('base64') %>" class="d-photo" alt="Head Photo"/>
+          <% } else { %>
+            <div class="d-photo-placeholder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <% } %>
+        </div>
+        <div class="photo-col">
+          <div class="photo-lbl">Live Photo <span class="live-tag">Live</span></div>
+          <% if (head.live_photo && head.live_photo.data) { %>
+            <img src="data:<%= head.live_photo.mimetype %>;base64,<%= head.live_photo.data.toString('base64') %>" class="d-photo" alt="Live Photo"/>
+          <% } else { %>
+            <div class="d-photo-placeholder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <% } %>
+        </div>
+        <div class="photo-col">
+          <div class="photo-lbl">ID Proof</div>
+          <% if (idProof && idProof.proof_image && idProof.proof_image.data) { %>
+            <img src="data:<%= idProof.proof_image.mimetype %>;base64,<%= idProof.proof_image.data.toString('base64') %>" class="d-photo proof-img" alt="ID Proof"/>
+          <% } else { %>
+            <div class="d-photo-placeholder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Head details -->
+      <div class="detail-grid-section">
+        <div class="sec-title-sm">Head Details</div>
+        <div class="info-grid">
+          <div class="info-item"><span class="info-lbl">Name</span><span class="info-val"><%= head.head_name %></span></div>
+          <div class="info-item"><span class="info-lbl">Phone</span><span class="info-val"><%= head.phone %></span></div>
+          <div class="info-item"><span class="info-lbl">Occupation</span><span class="info-val"><%= head.occupation %></span></div>
+          <div class="info-item"><span class="info-lbl">Status</span>
+            <span class="info-val">
+              <span class="sbadge <%= head.status === 'active' ? 'sbadge-active' : 'sbadge-inactive' %>"><%= head.status %></span>
+            </span>
+          </div>
+          <div class="info-item full"><span class="info-lbl">Address</span><span class="info-val"><%= head.permanent_address %></span></div>
+          <% if (idProof) { %>
+            <div class="info-item"><span class="info-lbl">ID Proof Type</span><span class="info-val"><%= idProof.id_proof_type %></span></div>
+            <div class="info-item"><span class="info-lbl">ID Proof Number</span><span class="info-val uid"><%= idProof.id_proof_number %></span></div>
+          <% } %>
+          <div class="info-item"><span class="info-lbl">Registered</span><span class="info-val"><%= new Date(head.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) %></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MEMBERS SECTION ── -->
+    <div class="members-section">
+
+      <div class="members-header">
+        <div>
+          <h5 class="members-title">Family Members</h5>
+          <p class="members-sub"><%= members.length %> member<%= members.length !== 1 ? 's' : '' %> registered</p>
+        </div>
+        <!-- Add Member button (Step 3 of flow) -->
+        <a href="/family/<%= head._id %>/members/add" class="btn-add-member">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Member
+        </a>
+      </div>
+
+      <% if (members.length === 0) { %>
+        <div class="no-members">
+          <div class="no-members-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+          </div>
+          <p>No members added yet.</p>
+          <a href="/family/<%= head._id %>/members/add" class="btn-add-member mt-2">Add First Member</a>
+        </div>
+      <% } else { %>
+
+        <div class="member-list">
+          <% members.forEach((member, i) => { %>
+            <div class="member-row">
+
+              <!-- Serial -->
+              <div class="mem-serial"><%= i + 1 %></div>
+
+              <!-- Photo -->
+              <div class="mem-photo-wrap">
+                <% if (member.member_photo && member.member_photo.data) { %>
+                  <img src="data:<%= member.member_photo.mimetype %>;base64,<%= member.member_photo.data.toString('base64') %>" class="mem-photo" alt="<%= member.name %>"/>
+                <% } else { %>
+                  <div class="mem-photo-placeholder">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                <% } %>
+              </div>
+
+              <!-- Info -->
+              <div class="mem-info">
+                <div class="mem-name"><%= member.name %></div>
+                <div class="mem-meta">
+                  <span class="relation-badge"><%= member.relation %></span>
+                  <span>Age: <%= member.age %></span>
+                  <% if (member.occupation && member.occupation !== 'Not specified') { %>
+                    <span><%= member.occupation %></span>
+                  <% } %>
+                  <% if (member.phone) { %>
+                    <span><%= member.phone %></span>
+                  <% } %>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="mem-actions">
+                <form action="/family/<%= head._id %>/members/<%= member._id %>/delete" method="POST" style="display:inline" onsubmit="return confirm('Remove <%= member.name %> from this family?')">
+                  <button type="submit" class="mem-del-btn">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                    </svg>
+                    Remove
+                  </button>
+                </form>
+              </div>
+
+            </div>
+          <% }) %>
+        </div>
+
+      <% } %>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/family.css"/>
+</head>
+<body>
+
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <a href="/dashboard" class="logo">
+        <svg width="30" height="30" viewBox="0 0 38 38" fill="none">
+          <rect width="38" height="38" rx="10" fill="#1b4332"/>
+          <path d="M19 7L9 14v16h6v-8h8v8h6V14L19 7z" fill="#d4a853"/>
+        </svg>
+        <span>GramSeva</span>
+      </a>
+      <div class="nav-right">
+        <span class="owner-name"><%= typeof owner !== 'undefined' && owner ? owner.name : 'Owner' %></span>
+        <a href="/logout" class="logout-btn">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+    <a href="/dashboard" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Dashboard
+    </a>
+
+    <div class="form-card">
+
+      <!-- Header -->
+      <div class="form-header">
+        <div class="header-icon amber">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <div>
+          <h4 class="form-title">Add Family Head</h4>
+          <p class="form-sub">Step 1 of 3 — Head profile &amp; photo</p>
+        </div>
+        <div class="step-pill">1 / 3</div>
+      </div>
+
+      <!-- Errors -->
+      <% if (errors.length > 0) { %>
+        <div class="alert alert-danger rounded-3">
+          <% errors.forEach(e => { %><p class="mb-0 small"><%= e.msg %></p><% }) %>
+        </div>
+      <% } %>
+
+      <form action="/family/add" method="POST" enctype="multipart/form-data" id="headForm">
+
+        <!-- Personal Details -->
+        <div class="sec-label"><span class="sec-num">01</span> Personal Details</div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Full Name <span class="req">*</span></label>
+          <input type="text" name="head_name" class="form-control ci" placeholder="Family head full name" value="<%= formData.head_name || '' %>" required/>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Phone <span class="req">*</span></label>
+            <input type="tel" name="phone" class="form-control ci" placeholder="10-digit number" value="<%= formData.phone || '' %>" maxlength="10" required/>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Occupation <span class="req">*</span></label>
+            <input type="text" name="occupation" class="form-control ci" placeholder="e.g. Farmer, Labour" value="<%= formData.occupation || '' %>" required/>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Permanent Address <span class="req">*</span></label>
+          <textarea name="permanent_address" class="form-control ci" rows="2" placeholder="Village, Taluka, District, Pin" required><%= formData.permanent_address || '' %></textarea>
+        </div>
+
+        <!-- Head Photo -->
+        <div class="sec-label"><span class="sec-num">02</span> Head Photo</div>
+
+        <div class="mb-3">
+          <div class="upload-box" id="uploadBox" onclick="document.getElementById('headPhotoInput').click()">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="upload-icon">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p class="upload-hint" id="uploadHint">Click to upload head photo</p>
+            <img id="headPhotoPreview" src="" alt="" class="upload-preview"/>
+          </div>
+          <input type="file" name="head_photo" id="headPhotoInput" accept="image/jpeg,image/png" required style="display:none"/>
+        </div>
+
+        <!-- Live Photo -->
+        <div class="sec-label"><span class="sec-num">03</span> Live Photo Capture</div>
+
+        <div class="camera-box mb-4">
+          <div class="camera-controls">
+            <button type="button" class="btn btn-outline-success btn-sm" id="openCamBtn">Open Camera</button>
+            <button type="button" class="btn btn-success btn-sm ms-2" id="capBtn" style="display:none">Capture</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="stopCamBtn" style="display:none">Cancel</button>
+          </div>
+          <div id="camStream" style="display:none;margin-top:10px">
+            <video id="camVideo" autoplay playsinline class="cam-video"></video>
+          </div>
+          <div id="camResult" style="display:none;margin-top:10px">
+            <img id="capturedImg" src="" class="captured-img"/>
+            <div class="captured-ok">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Live photo captured
+              <button type="button" class="btn btn-link btn-sm p-0 ms-2 text-danger" id="retakeBtn">Retake</button>
+            </div>
+          </div>
+          <input type="hidden" name="live_photo_base64" id="livePhotoData"/>
+        </div>
+
+        <div class="form-footer">
+          <a href="/dashboard" class="btn btn-outline-secondary px-4">Cancel</a>
+          <button type="submit" class="btn-submit" id="submitBtn">
+            Save &amp; Add ID Proof
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ms-2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/family.js"></script>
+</body>
+</html>
