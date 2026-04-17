@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/family-edit.css"/>
+</head>
+<body>
+
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <a href="/dashboard" class="logo">
+        <svg width="30" height="30" viewBox="0 0 38 38" fill="none">
+          <rect width="38" height="38" rx="10" fill="#1b4332"/>
+          <path d="M19 7L9 14v16h6v-8h8v8h6V14L19 7z" fill="#d4a853"/>
+        </svg>
+        <span>GramSeva</span>
+      </a>
+      <div class="nav-right">
+        <span class="owner-name"><%= typeof owner !== 'undefined' && owner ? owner.name : 'Owner' %></span>
+        <a href="/logout" class="logout-btn">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-wrap">
+    <a href="/family/<%= family._id %>/detail" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to Family
+    </a>
+
+    <div class="edit-card">
+
+      <!-- Header -->
+      <div class="edit-header">
+        <div class="edit-icon amber">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </div>
+        <div>
+          <h4 class="edit-title">Edit Family Head</h4>
+          <p class="edit-sub">Updating details for <strong><%= family.head_name %></strong></p>
+        </div>
+      </div>
+
+      <!-- Errors -->
+      <% if (errors.length > 0) { %>
+        <div class="alert alert-danger rounded-3">
+          <% errors.forEach(e => { %><p class="mb-0 small"><%= e.msg %></p><% }) %>
+        </div>
+      <% } %>
+
+      <form
+        action="/family/<%= family._id %>?_method=PUT"
+        method="POST"
+        enctype="multipart/form-data"
+        id="editFamilyForm"
+      >
+
+        <!-- Personal Details -->
+        <div class="sec-label"><span class="sec-num">01</span> Personal Details</div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Full Name <span class="req">*</span></label>
+          <input type="text" name="head_name" class="form-control ci" value="<%= family.head_name %>" required/>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Phone <span class="req">*</span></label>
+            <input type="tel" name="phone" class="form-control ci" value="<%= family.phone %>" maxlength="10" required/>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Occupation <span class="req">*</span></label>
+            <input type="text" name="occupation" class="form-control ci" value="<%= family.occupation %>" required/>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Permanent Address <span class="req">*</span></label>
+          <textarea name="permanent_address" class="form-control ci" rows="2" required><%= family.permanent_address %></textarea>
+        </div>
+
+        <!-- Update Head Photo -->
+        <div class="sec-label"><span class="sec-num">02</span> Update Head Photo <span class="opt-tag">Optional</span></div>
+
+        <div class="current-row">
+          <div class="cur-photo-wrap">
+            <% if (family.head_photo && family.head_photo.data) { %>
+              <img src="data:<%= family.head_photo.mimetype %>;base64,<%= family.head_photo.data.toString('base64') %>" class="cur-photo" id="headPhotoPreview" alt="Head Photo"/>
+            <% } else { %>
+              <div class="cur-placeholder" id="headPhotoPreview">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+            <% } %>
+          </div>
+          <div class="cur-info">
+            <p class="cur-label">Current head photo</p>
+            <p class="cur-hint">Leave empty to keep current photo.</p>
+            <label class="upload-trigger" for="headPhotoInput">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Choose New Photo
+            </label>
+            <input type="file" name="head_photo" id="headPhotoInput" accept="image/jpeg,image/png" style="display:none"/>
+          </div>
+        </div>
+
+        <!-- Update ID Proof -->
+        <div class="sec-label"><span class="sec-num">03</span> Update ID Proof <span class="opt-tag">Optional</span></div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">ID Proof Type</label>
+            <select name="id_proof_type" class="form-select ci">
+              <option value="">-- Keep existing --</option>
+              <option value="Aadhaar"         <%= idProof && idProof.id_proof_type === 'Aadhaar'         ? 'selected' : '' %>>Aadhaar Card</option>
+              <option value="Voter ID"        <%= idProof && idProof.id_proof_type === 'Voter ID'        ? 'selected' : '' %>>Voter ID</option>
+              <option value="PAN"             <%= idProof && idProof.id_proof_type === 'PAN'             ? 'selected' : '' %>>PAN Card</option>
+              <option value="Passport"        <%= idProof && idProof.id_proof_type === 'Passport'        ? 'selected' : '' %>>Passport</option>
+              <option value="Driving Licence" <%= idProof && idProof.id_proof_type === 'Driving Licence' ? 'selected' : '' %>>Driving Licence</option>
+            </select>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">ID Proof Number</label>
+            <input type="text" name="id_proof_number" class="form-control ci" placeholder="Leave empty to keep existing" value="<%= idProof ? idProof.id_proof_number : '' %>"/>
+          </div>
+        </div>
+
+        <div class="current-row mb-4">
+          <div class="cur-photo-wrap">
+            <% if (idProof && idProof.proof_image && idProof.proof_image.data) { %>
+              <img src="data:<%= idProof.proof_image.mimetype %>;base64,<%= idProof.proof_image.data.toString('base64') %>" class="cur-photo cur-proof" id="proofPreview" alt="ID Proof"/>
+            <% } else { %>
+              <div class="cur-placeholder" id="proofPreview">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+              </div>
+            <% } %>
+          </div>
+          <div class="cur-info">
+            <p class="cur-label">Current ID proof image</p>
+            <p class="cur-hint">Leave empty to keep current image.</p>
+            <label class="upload-trigger" for="proofImageInput">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Choose New Image
+            </label>
+            <input type="file" name="proof_image" id="proofImageInput" accept="image/jpeg,image/png" style="display:none"/>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="edit-footer">
+          <a href="/family/<%= family._id %>/detail" class="btn btn-outline-secondary px-4">Cancel</a>
+          <button type="submit" class="btn-save" id="saveBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="me-2"><polyline points="20 6 9 17 4 12"/></svg>
+            Save Changes
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/family-edit.js"></script>
+</body>
+</html>
